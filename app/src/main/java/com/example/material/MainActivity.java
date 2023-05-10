@@ -140,11 +140,11 @@ public class MainActivity extends AppCompatActivity {
 
         // touch
         imageView.setOnClickListener(v -> {
+            imageView.setImageResource(R.drawable.explosion);
             if (unpause) {
                 bombClicked = true;
                 unpause = false;
                 scoreView();
-                imageView.setImageResource(R.drawable.explosion);
             }
         });
     }
