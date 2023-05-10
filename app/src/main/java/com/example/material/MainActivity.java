@@ -2,19 +2,22 @@ package com.example.material;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     float windowX;
     float windowY;
+    int duckSize = 200;
+    boolean unpause = true;
+    int score = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,11 +27,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void startTimer() {
         final ProgressBar progressBar = findViewById(R.id.progressTime);
-        final int totalTime = 60000;
+        final int totalTime = 10000;
         new CountDownTimer(totalTime, 1000) {
             public void onFinish() {
                 progressBar.setProgress(100);
                 Toast.makeText(getApplicationContext(), "Time's up!", Toast.LENGTH_SHORT).show();
+                unpause = false;
+                scoreView();
             }
 
             public void onTick(long millisUntilFinished) {
@@ -56,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     public void setWindowSize(int width, int height) {
         this.windowX = width;
         this.windowY = height;
-        Toast.makeText(getApplicationContext(), "New Window Focus: " + windowX + " " + windowY, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "New Window Focus: " + windowX + " " + windowY, Toast.LENGTH_SHORT).show();
     }
 
     private void spawnDuck() {
@@ -73,16 +78,48 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         // size
-        params.width = 200;
-        params.height = 200;
+        params.width = duckSize;
+        params.height = duckSize;
         imageView.setLayoutParams(params);
         // pos
-        imageView.setX((windowX-200)/2);
-        imageView.setY((windowY-200)/2);
+        imageView.setX((windowX - duckSize) / 2);
+        imageView.setY((windowY - duckSize) / 2);
 
+
+            // touchitouchi
+            imageView.setOnClickListener(v -> {
+                if (unpause) {
+                    duckSize -= 2;
+                    params.width = duckSize;
+                    params.height = duckSize;
+                    imageView.setLayoutParams(params);
+                    imageView.setX(randomNumber(0, (windowX - (duckSize * 2))));
+                    imageView.setY(randomNumber(0, (windowY - (duckSize * 2))));
+                    score++;
+                    //Toast.makeText(getApplicationContext(), "Duck Clicked! New Pos: X:" + imageView.getX() + ", Y: " + imageView.getY(), Toast.LENGTH_SHORT).show();
+                    System.out.println("Duck Clicked! New Pos: X:" + imageView.getX() + ", Y: " + imageView.getY());
+                }
+            });
+        }
+
+    private float randomNumber(float min, float max) {
+        return (float) (Math.random() * (max - min) + min);
     }
 
-
-
-
+    public void scoreView() {
+        TextView scoreView = new TextView(this);
+        scoreView.setText("Score: " + score);
+        scoreView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        // get layout
+        ViewGroup layout = findViewById(R.id.gameFrame);
+        layout.addView(scoreView);
+        layout.bringChildToFront(scoreView);
+        scoreView.setTextSize(30);
+        scoreView.setTypeface(null, Typeface.BOLD);
+        //set center
+        scoreView.setX((windowX / 3) - scoreView.getWidth());
+        scoreView.setY((windowY / 3) - scoreView.getHeight());
+    }
 }
