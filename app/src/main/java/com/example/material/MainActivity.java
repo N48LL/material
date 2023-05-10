@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startTimer() {
         final ProgressBar progressBar = findViewById(R.id.progressTime);
-        final int totalTime = 10000;
+        final int totalTime = 3000;
         new CountDownTimer(totalTime, 1000) {
             public void onFinish() {
                 progressBar.setProgress(100);
@@ -107,19 +107,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void scoreView() {
+
+        //gameover
+        TextView gameOver = new TextView(this);
+        gameOver.setText(R.string.game_over);
+        gameOver.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+
+        //score txt
         TextView scoreView = new TextView(this);
         scoreView.setText("Score: " + score);
         scoreView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-        // get layout
+        // get parent layout ???
         ViewGroup layout = findViewById(R.id.gameFrame);
-        layout.addView(scoreView);
+
+        //format
         layout.bringChildToFront(scoreView);
+        layout.bringChildToFront(gameOver);
         scoreView.setTextSize(30);
         scoreView.setTypeface(null, Typeface.BOLD);
-        //set center
+        gameOver.setTextColor(getResources().getColor(R.color.red));
+        gameOver.setTextSize(50);
+        gameOver.setTypeface(null, Typeface.BOLD);
+
+        //spawn + set center
+        layout.addView(scoreView);
         scoreView.setX((windowX / 3) - scoreView.getWidth());
         scoreView.setY((windowY / 3) - scoreView.getHeight());
+        layout.addView(gameOver);
+        gameOver.setX((windowX / 6) - gameOver.getWidth());
+        gameOver.setY((windowY / 4) - gameOver.getHeight());
     }
 }
