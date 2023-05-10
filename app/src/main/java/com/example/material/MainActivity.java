@@ -16,6 +16,9 @@ public class MainActivity extends AppCompatActivity {
     float windowX;
     float windowY;
     int duckSize = 200;
+    int bombSize = 200;
+    boolean bombSpawned = false;
+    boolean bombClicked = false;
     boolean unpause = true;
     int score = 0;
 
@@ -27,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startTimer() {
         final ProgressBar progressBar = findViewById(R.id.progressTime);
-        final int totalTime = 3000;
+        final int totalTime = 30000;
         new CountDownTimer(totalTime, 1000) {
             public void onFinish() {
                 progressBar.setProgress(100);
@@ -40,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
                 int timeLeft = (int) millisUntilFinished;
                 int progress = (int) (((float) (totalTime - timeLeft) / totalTime) * 100);
                 progressBar.setProgress(progress);
+                if (progress > 50 && !bombSpawned) {
+                    spawnBomb();
+                    bombSpawned = true;
+                }
             }
         }.start();
     }
@@ -96,11 +103,59 @@ public class MainActivity extends AppCompatActivity {
                     imageView.setX(randomNumber(0, (windowX - (duckSize * 2))));
                     imageView.setY(randomNumber(0, (windowY - (duckSize * 2))));
                     score++;
+                    //get bomb imageview
+                    if (bombSpawned) {
+                        ImageView bomb = getBombImageView();
+                        bomb.setX(randomNumber(0, (windowX - (bombSize * 2))));
+                        bomb.setY(randomNumber(0, (windowY - (bombSize * 2))));
+
+                    }
                     //Toast.makeText(getApplicationContext(), "Duck Clicked! New Pos: X:" + imageView.getX() + ", Y: " + imageView.getY(), Toast.LENGTH_SHORT).show();
                     System.out.println("Duck Clicked! New Pos: X:" + imageView.getX() + ", Y: " + imageView.getY());
                 }
             });
         }
+
+    private void spawnBomb() {
+        ImageView imageView = new ImageView(this);
+        setBombImageView(imageView);
+        imageView.setImageResource(R.drawable.bomb);
+        imageView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        // get layout
+        ViewGroup layout = findViewById(R.id.gameFrame);
+        layout.addView(imageView);
+        // get params
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        // size
+        params.width = bombSize;
+        params.height = bombSize;
+        imageView.setLayoutParams(params);
+        // pos
+        imageView.setX(randomNumber(0, (windowX - (bombSize * 2))));
+        imageView.setY(randomNumber(0, (windowY - (bombSize * 2))));
+
+        // touch
+        imageView.setOnClickListener(v -> {
+            if (unpause) {
+                bombClicked = true;
+                unpause = false;
+                scoreView();
+                imageView.setImageResource(R.drawable.explosion);
+            }
+        });
+    }
+
+    ImageView bomb;
+    private void setBombImageView(ImageView bomb) {
+        this.bomb = bomb;
+    }
+    private ImageView getBombImageView() {
+        return this.bomb;
+    }
 
     private float randomNumber(float min, float max) {
         return (float) (Math.random() * (max - min) + min);
@@ -141,4 +196,5 @@ public class MainActivity extends AppCompatActivity {
         gameOver.setX((windowX / 6) - gameOver.getWidth());
         gameOver.setY((windowY / 4) - gameOver.getHeight());
     }
+
 }
