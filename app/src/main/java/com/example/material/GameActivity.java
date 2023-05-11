@@ -2,6 +2,7 @@ package com.example.material;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -11,8 +12,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 public class GameActivity extends AppCompatActivity {
 
+    Dialog dialog;
     float windowX;
     float windowY;
     int duckSize = 200;
@@ -30,7 +34,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void startTimer() {
         final ProgressBar progressBar = findViewById(R.id.progressTime);
-        final int totalTime = 30000;
+        final int totalTime = 10000;
         new CountDownTimer(totalTime, 1000) {
             public void onFinish() {
                 progressBar.setProgress(100);
@@ -43,7 +47,7 @@ public class GameActivity extends AppCompatActivity {
                 int timeLeft = (int) millisUntilFinished;
                 int progress = (int) (((float) (totalTime - timeLeft) / totalTime) * 100);
                 progressBar.setProgress(progress);
-                if (progress > 50 && !bombSpawned) {
+                if (progress == 50 && !bombSpawned) {
                     spawnBomb();
                     bombSpawned = true;
                 }
@@ -61,6 +65,8 @@ public class GameActivity extends AppCompatActivity {
             int height = layout.getHeight();
             setWindowSize(width, height);
             startTimer();
+            spawnDuck();
+            spawnDuck();
             spawnDuck();
         }
     }
@@ -92,7 +98,6 @@ public class GameActivity extends AppCompatActivity {
         imageView.setX((windowX - duckSize) / 2);
         imageView.setY((windowY - duckSize) / 2);
 
-
         // touchitouchi
         imageView.setOnClickListener(v -> {
             if (unpause) {
@@ -100,14 +105,14 @@ public class GameActivity extends AppCompatActivity {
                 params.width = duckSize;
                 params.height = duckSize;
                 imageView.setLayoutParams(params);
-                imageView.setX(randomNumber(0, (windowX - (duckSize * 2))));
-                imageView.setY(randomNumber(0, (windowY - (duckSize * 2))));
+                imageView.setX(randomNumber((windowX - (duckSize * 2))));
+                imageView.setY(randomNumber((windowY - (duckSize * 2))));
                 score++;
                 //get bomb imageview
                 if (bombSpawned) {
                     ImageView bomb = getBombImageView();
-                    bomb.setX(randomNumber(0, (windowX - (bombSize * 2))));
-                    bomb.setY(randomNumber(0, (windowY - (bombSize * 2))));
+                    bomb.setX(randomNumber((windowX - (bombSize * 2))));
+                    bomb.setY(randomNumber((windowY - (bombSize * 2))));
 
                 }
                 //Toast.makeText(getApplicationContext(), "Duck Clicked! New Pos: X:" + imageView.getX() + ", Y: " + imageView.getY(), Toast.LENGTH_SHORT).show();
@@ -135,8 +140,8 @@ public class GameActivity extends AppCompatActivity {
         params.height = bombSize;
         imageView.setLayoutParams(params);
         // pos
-        imageView.setX(randomNumber(0, (windowX - (bombSize * 2))));
-        imageView.setY(randomNumber(0, (windowY - (bombSize * 2))));
+        imageView.setX(randomNumber((windowX - (bombSize * 2))));
+        imageView.setY(randomNumber((windowY - (bombSize * 2))));
 
         // touch
         imageView.setOnClickListener(v -> {
@@ -157,12 +162,20 @@ public class GameActivity extends AppCompatActivity {
         return this.bomb;
     }
 
-    private float randomNumber(float min, float max) {
-        return (float) (Math.random() * (max - min) + min);
+    private float randomNumber(float max) {
+        return (float) (Math.random() * (max - (float) 0) + (float) 0);
     }
 
     public void scoreView() {
 
+        dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+        dialog.setContentView(R.layout.game_over);
+        dialog.show();
+        unpause = true;
+
+        TextView txtScore = dialog.findViewById(R.id.txt_score);
+        txtScore.setText("Score: " + Integer.toString(score));
+        /*
         //gameover
         TextView gameOver = new TextView(this);
         gameOver.setText(R.string.game_over);
@@ -195,5 +208,6 @@ public class GameActivity extends AppCompatActivity {
         layout.addView(gameOver);
         gameOver.setX((windowX / 6) - gameOver.getWidth());
         gameOver.setY((windowY / 4) - gameOver.getHeight());
+        */
     }
 }
